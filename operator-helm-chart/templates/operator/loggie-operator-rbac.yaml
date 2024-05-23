@@ -2,15 +2,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: loggie-role-{{ template "loggie.name" . }}
+  name: loggie-operator-role-{{ template "operator.name" . }}
 rules:
   - apiGroups:
     - ""
     resources:
-      - replicasets
       - pods
-      - pods/log
-      - nodes
     verbs:
       - get
       - watch
@@ -35,6 +32,7 @@ rules:
       - get
       - list
       - watch
+      - patch
   - apiGroups:
     - loggie.io
     resources:
@@ -59,31 +57,24 @@ rules:
       - get
       - list
       - update
-  - apiGroups:
-    - metrics.k8s.io
-    resources:
-      - pods
-    verbs:
-      - get
-      - list
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: loggie-rolebinding-{{ template "loggie.name" . }}
+  name: loggie-operator-rolebinding-{{ template "operator.name" . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: loggie-role-{{ template "loggie.name" . }}
+  name: loggie-operator-role-{{ template "operator.name" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ template "loggie.name" . }}
+    name: loggie-operator-{{ template "operator.name" . }}
     namespace: {{ .Release.Namespace }}
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ template "loggie.name" . }}
+  name: loggie-operator-{{ template "operator.name" . }}
   namespace: {{ .Release.Namespace }}
